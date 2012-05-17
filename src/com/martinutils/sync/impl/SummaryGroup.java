@@ -15,9 +15,6 @@ import com.martinutils.sync.IProvider;
  */
 public class SummaryGroup<O>
 {
-
-    private static final long serialVersionUID = -5919415255713697970L;
-
     private final Map<IProvider<O>, IItemSummary<O>> summaries = new HashMap<IProvider<O>, IItemSummary<O>>();
 
     public Collection<IItemSummary<O>> getSummaries()

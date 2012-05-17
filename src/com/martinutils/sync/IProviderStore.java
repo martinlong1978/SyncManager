@@ -1,6 +1,6 @@
 package com.martinutils.sync;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface IProviderStore<O>
 {
@@ -14,7 +14,7 @@ public interface IProviderStore<O>
 
     public IItemSummary<O> deleteItemSummary(String id);
 
-    public List<IItemSummary<O>> getUnreadSummaries();
+    public Collection<IItemSummary<O>> getUnreadSummaries();
 
     public void addItemSummary(IItemSummary<O> itemSummary);
 

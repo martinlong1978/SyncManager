@@ -11,7 +11,8 @@ public class SyncState<O>
 
     public ProviderStore<O> getStoreForProvider(IProvider<O> provider)
     {
-        return stores.get(provider.getName());
+        ProviderStore<O> providerStore = stores.get(provider.getName());
+        return providerStore == null ? new ProviderStore<O>() : providerStore;
     }
 
 }

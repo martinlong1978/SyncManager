@@ -28,11 +28,13 @@ public class SyncManager<O> implements ISyncManager<O>
 
     private IConflictListener<O> listener;
 
+    private final SyncState<O> syncState = new SyncState<O>();
+
     @Override
     public void addProvider(IProvider<O> provider)
     {
         providers.add(provider);
-        provider.setProviderStore(new ProviderStore<O>());
+        provider.setProviderStore(syncState.getStoreForProvider(provider));
     }
 
     @Override

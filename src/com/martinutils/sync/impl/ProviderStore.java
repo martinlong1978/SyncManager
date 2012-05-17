@@ -1,6 +1,8 @@
 package com.martinutils.sync.impl;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.martinutils.sync.IItemSummary;
 import com.martinutils.sync.IProviderStore;
@@ -8,39 +10,41 @@ import com.martinutils.sync.IProviderStore;
 public class ProviderStore<O> implements IProviderStore<O>
 {
 
+    private final Map<String, IItemSummary<O>> items = new HashMap<String, IItemSummary<O>>();
+
+    private Map<String, IItemSummary<O>> tempSummaries = new HashMap<String, IItemSummary<O>>();
+
     @Override
     public IItemSummary<O> getItemSummary(String id)
     {
-        // TODO Auto-generated method stub
-        return null;
+        tempSummaries.remove(id);
+        return items.get(id);
     }
 
     @Override
     public void addItemSummary(IItemSummary<O> itemSummary)
     {
-        // TODO Auto-generated method stub
-
+        items.put(itemSummary.getIdentifier(), itemSummary);
+        tempSummaries.put(itemSummary.getIdentifier(), itemSummary);
     }
 
     @Override
     public void reset()
     {
-        // TODO Auto-generated method stub
-
+        tempSummaries = new HashMap<String, IItemSummary<O>>(items);
     }
 
     @Override
-    public List<IItemSummary<O>> getUnreadSummaries()
+    public Collection<IItemSummary<O>> getUnreadSummaries()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return tempSummaries.values();
     }
 
     @Override
     public IItemSummary<O> deleteItemSummary(String id)
     {
-        // TODO Auto-generated method stub
-        return null;
+        tempSummaries.remove(id);
+        return items.remove(id);
     }
 
 }
