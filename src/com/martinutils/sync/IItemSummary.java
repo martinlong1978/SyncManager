@@ -14,16 +14,16 @@ public interface IItemSummary<O>
      * 
      * @return The provider
      */
-    IProvider<O> getProvider();
+    public IProvider<O> getProvider();
 
     /**
      * The provider specific identifier for this object.
      * 
      * @return The provider specific identifier for this object.
      */
-    String getIdentifier();
+    public String getIdentifier();
 
-    String getGlobalID();
+    public String getGlobalID();
 
     /**
      * A hash for the object. This could be a genuine hash of the object or a
@@ -31,10 +31,10 @@ public interface IItemSummary<O>
      * 
      * @return A string representation of an object hash.
      */
-    String getHash();
+    public String getHash();
 
-    void setSummaryGroup(SummaryGroup<O> group);
+    public void setSummaryGroup(SummaryGroup<O> group);
 
-    SummaryGroup<O> getSummaryGroup();
+    public SummaryGroup<O> getSummaryGroup();
 
 }

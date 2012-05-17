@@ -5,6 +5,6 @@ import com.martinutils.sync.operations.Conflict;
 public interface IConflictListener<O>
 {
 
-    void onConflict(Conflict<O> conflict);
+    public void onConflict(Conflict<O> conflict);
 
 }

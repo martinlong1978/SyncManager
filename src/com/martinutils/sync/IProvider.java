@@ -3,7 +3,7 @@ package com.martinutils.sync;
 public interface IProvider<O>
 {
 
-    void deleteObject(String id);
+    public void deleteObject(String id);
 
     /**
      * Insert this object into the provider.
@@ -12,9 +12,9 @@ public interface IProvider<O>
      *            The object to be inserted
      * @return A new or existing summary group.
      */
-    IItemSummary<O> insertObject(O object);
+    public IItemSummary<O> insertObject(O object);
 
-    IItemSummary<O> updateObject(String id, O object);
+    public IItemSummary<O> updateObject(String id, O object);
 
     /**
      * There may be cases when there first sync occurs when both ends already
@@ -28,14 +28,16 @@ public interface IProvider<O>
      * @param object
      * @return
      */
-    IItemSummary<O> findEquivalent(IItemSummary<O> summary);
+    public IItemSummary<O> findEquivalent(IItemSummary<O> summary);
 
-    O fetchObject(String id);
+    public O fetchObject(String id);
 
-    IItemSummary<O>[] getSummaries();
+    public IItemSummary<O>[] getSummaries();
 
-    void setProviderStore(IProviderStore<O> store);
+    public void setProviderStore(IProviderStore<O> store);
 
-    IProviderStore<O> getProviderStore();
+    public IProviderStore<O> getProviderStore();
+
+    public String getName();
 
 }

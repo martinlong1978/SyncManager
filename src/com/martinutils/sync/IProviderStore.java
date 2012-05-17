@@ -8,14 +8,14 @@ public interface IProviderStore<O>
      * 
      * Reset all summaries to unread.
      */
-    void reset();
+    public void reset();
 
-    IItemSummary<O> getItemSummary(String id);
+    public IItemSummary<O> getItemSummary(String id);
 
-    IItemSummary<O> deleteItemSummary(String id);
+    public IItemSummary<O> deleteItemSummary(String id);
 
-    List<IItemSummary<O>> getUnreadSummaries();
+    public List<IItemSummary<O>> getUnreadSummaries();
 
-    void addItemSummary(IItemSummary<O> itemSummary);
+    public void addItemSummary(IItemSummary<O> itemSummary);
 
 }
