@@ -8,16 +8,6 @@ public interface IProvider<O>
     /**
      * Insert this object into the provider.
      * 
-     * There may be cases when there first sync occurs when both ends already
-     * contain equivalent data (for example after a backup is restored). If the
-     * provider can determine equivalence with an existing record, then it
-     * should not do the insert, but instead return the existing IItemSummary
-     * for that item. It must use this opportunity to resolve any conflict based
-     * on the data in object.
-     * 
-     * In those cases a conflict will not be reported, but a separate insert
-     * call will be made on each provider.
-     * 
      * @param object
      *            The object to be inserted
      * @return A new or existing summary group.
@@ -25,6 +15,20 @@ public interface IProvider<O>
     IItemSummary<O> insertObject(O object);
 
     IItemSummary<O> updateObject(String id, O object);
+
+    /**
+     * There may be cases when there first sync occurs when both ends already
+     * contain equivalent data (for example after a backup is restored). If the
+     * provider can determine equivalence with an existing record then it can
+     * return that from here. Extend IItemSummary if you need additional details
+     * to determine equivalence.
+     * 
+     * Create the new summary and return it.
+     * 
+     * @param object
+     * @return
+     */
+    IItemSummary<O> findEquivalent(IItemSummary<O> summary);
 
     O fetchObject(String id);
 

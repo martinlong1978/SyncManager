@@ -91,8 +91,9 @@ public class SyncManager<O> implements ISyncManager<O>
             {
                 final O fetchObject = storedSummary.getProvider().fetchObject(storedSummary.getIdentifier());
                 SummaryGroup<O> summaryGroup = storedSummary.getSummaryGroup();
-                IItemSummary<O> newSummary = provider.insertObject(fetchObject);
-                summaryGroup.addSummary(newSummary);
+                IItemSummary<O> updatedSummary = provider.insertObject(fetchObject);
+                summaryGroup.addSummary(updatedSummary);
+                updatedSummary.getProvider().getProviderStore().addItemSummary(updatedSummary);
             }
         }
     }
@@ -157,6 +158,7 @@ public class SyncManager<O> implements ISyncManager<O>
                         summaryGroup.addSummary(updatedSummary);
                     }
                 }
+                newSummary.getProvider().getProviderStore().addItemSummary(newSummary);
                 summaryGroup.addSummary(newSummary);
             }
         }));
@@ -164,26 +166,21 @@ public class SyncManager<O> implements ISyncManager<O>
 
     private void addItem(final IItemSummary<O> summary)
     {
+        // This can be done straight away, as there will never be a conflict.
         final SummaryGroup<O> summaryGroup = new SummaryGroup<O>();
-        addDeferredAction(summaryGroup, new Action<O>(Operations.INSERT, summary, new Runnable() {
-            @Override
-            public void run()
+        final O fetchObject = summary.getProvider().fetchObject(summary.getIdentifier());
+        // Loop through each provider.
+        for (IProvider<O> provider : providers)
+        {
+            if (provider != summary.getProvider())
             {
-                final O fetchObject = summary.getProvider().fetchObject(summary.getIdentifier());
-                // Loop through each provider.
-                for (IProvider<O> provider : providers)
-                {
-                    if (provider != summary.getProvider())
-                    {
-                        IItemSummary<O> updatedSummary = provider.insertObject(fetchObject);
-                        provider.getProviderStore().addItemSummary(updatedSummary);
-                        summaryGroup.addSummary(updatedSummary);
-                    }
-                }
-                summary.getProvider().getProviderStore().addItemSummary(summary);
-                summaryGroup.addSummary(summary);
+                IItemSummary<O> updatedSummary = provider.insertObject(fetchObject);
+                provider.getProviderStore().addItemSummary(updatedSummary);
+                summaryGroup.addSummary(updatedSummary);
             }
-        }));
+        }
+        summary.getProvider().getProviderStore().addItemSummary(summary);
+        summaryGroup.addSummary(summary);
     }
 
     @Override
