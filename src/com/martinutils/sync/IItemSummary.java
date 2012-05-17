@@ -23,6 +23,8 @@ public interface IItemSummary<O>
      */
     String getIdentifier();
 
+    String getGlobalID();
+
     /**
      * A hash for the object. This could be a genuine hash of the object or a
      * modified date. If you don't support updates this can be null.
