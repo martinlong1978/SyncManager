@@ -269,4 +269,9 @@ public class SyncManager<O> implements ISyncManager<O>
     {
         this.listener = listener;
     }
+
+    public SyncState<O> getSyncState()
+    {
+        return syncState;
+    }
 }
