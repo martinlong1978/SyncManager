@@ -12,7 +12,7 @@ public class ProviderStore<O> implements IProviderStore<O>
 
     private final Map<String, IItemSummary<O>> items = new HashMap<String, IItemSummary<O>>();
 
-    private Map<String, IItemSummary<O>> tempSummaries = new HashMap<String, IItemSummary<O>>();
+    private transient Map<String, IItemSummary<O>> tempSummaries = new HashMap<String, IItemSummary<O>>();
 
     @Override
     public IItemSummary<O> getItemSummary(String id)
@@ -24,8 +24,9 @@ public class ProviderStore<O> implements IProviderStore<O>
     @Override
     public void addItemSummary(IItemSummary<O> itemSummary)
     {
+        System.out.println("Adding: " + itemSummary);
         items.put(itemSummary.getIdentifier(), itemSummary);
-        tempSummaries.put(itemSummary.getIdentifier(), itemSummary);
+        // tempSummaries.put(itemSummary.getIdentifier(), itemSummary);
     }
 
     @Override

@@ -14,7 +14,7 @@ public interface IItemSummary<O>
      * 
      * @return The provider
      */
-    public IProvider<O> getProvider();
+    public String getProviderName();
 
     /**
      * The provider specific identifier for this object.

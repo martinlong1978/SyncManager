@@ -5,20 +5,16 @@ import com.martinutils.sync.impl.SummaryGroup;
 class TestItemSummary implements IItemSummary<SyncClass>
 {
     private SummaryGroup<SyncClass> group;
-    private final IProvider<SyncClass> provider;
+    private final String providerName;
     private final String id;
     private final String hash;
     private final String globalID;
 
-    public TestItemSummary(SummaryGroup<SyncClass> group,
-                           IProvider<SyncClass> provider,
-                           String id,
-                           String hash,
-                           String globalID)
+    public TestItemSummary(SummaryGroup<SyncClass> group, String provider, String id, String hash, String globalID)
     {
         super();
         this.group = group;
-        this.provider = provider;
+        this.providerName = provider;
         this.id = id;
         this.hash = hash;
         this.globalID = globalID;
@@ -34,12 +30,6 @@ class TestItemSummary implements IItemSummary<SyncClass>
     public SummaryGroup<SyncClass> getSummaryGroup()
     {
         return group;
-    }
-
-    @Override
-    public IProvider<SyncClass> getProvider()
-    {
-        return provider;
     }
 
     @Override
@@ -59,4 +49,17 @@ class TestItemSummary implements IItemSummary<SyncClass>
     {
         return globalID;
     }
+
+    @Override
+    public String getProviderName()
+    {
+        return providerName;
+    }
+
+    @Override
+    public String toString()
+    {
+        return providerName + "|" + id + "|" + hash + "|" + globalID + "|";
+    }
+
 }

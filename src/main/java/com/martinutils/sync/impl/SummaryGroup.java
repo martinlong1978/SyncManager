@@ -15,7 +15,7 @@ import com.martinutils.sync.IProvider;
  */
 public class SummaryGroup<O>
 {
-    private final Map<IProvider<O>, IItemSummary<O>> summaries = new HashMap<IProvider<O>, IItemSummary<O>>();
+    private final Map<String, IItemSummary<O>> summaries = new HashMap<String, IItemSummary<O>>();
 
     public Collection<IItemSummary<O>> getSummaries()
     {
@@ -25,7 +25,7 @@ public class SummaryGroup<O>
     public void addSummary(IItemSummary<O> summary)
     {
         summary.setSummaryGroup(this);
-        summaries.put(summary.getProvider(), summary);
+        summaries.put(summary.getProviderName(), summary);
     }
 
     public IItemSummary<O> getSummaryForProvider(IProvider<O> provider)

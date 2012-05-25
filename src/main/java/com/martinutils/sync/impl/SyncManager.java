@@ -2,11 +2,9 @@ package com.martinutils.sync.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.martinutils.sync.IConflictListener;
 import com.martinutils.sync.IItemSummary;
@@ -20,7 +18,7 @@ import com.martinutils.sync.operations.Operations;
 public class SyncManager<O> implements ISyncManager<O>
 {
 
-    private final Set<IProvider<O>> providers = new HashSet<IProvider<O>>();
+    private final HashMap<String, IProvider<O>> providers = new HashMap<String, IProvider<O>>();
 
     private final Map<SummaryGroup<O>, Action<O>> deferredActions = new HashMap<SummaryGroup<O>, Action<O>>();
 
@@ -33,7 +31,7 @@ public class SyncManager<O> implements ISyncManager<O>
     @Override
     public void addProvider(IProvider<O> provider)
     {
-        providers.add(provider);
+        providers.put(provider.getName(), provider);
         provider.setProviderStore(syncState.getStoreForProvider(provider));
     }
 
@@ -46,7 +44,7 @@ public class SyncManager<O> implements ISyncManager<O>
 
         // First pass, determines if there are any equivalents that shouldn't be
         // added.
-        for (IProvider<O> provider : providers)
+        for (IProvider<O> provider : providers.values())
         {
             IItemSummary<O>[] summaries = provider.getSummaries();
             providerSummaries.add(summaries);
@@ -68,7 +66,7 @@ public class SyncManager<O> implements ISyncManager<O>
         }
 
         // Second pass... now determine the actions
-        Iterator<IProvider<O>> iterator = providers.iterator();
+        Iterator<IProvider<O>> iterator = providers.values().iterator();
         for (IItemSummary<O>[] summaries : providerSummaries)
         {
             processProvider(summaries, iterator.next());
@@ -100,6 +98,7 @@ public class SyncManager<O> implements ISyncManager<O>
         }
         for (IItemSummary<O> summary : store.getUnreadSummaries())
         {
+            System.out.println(summary);
             // Item has been deleted
             deleteItem(summary);
         }
@@ -119,16 +118,16 @@ public class SyncManager<O> implements ISyncManager<O>
      */
     private void checkForNewProviders(final IItemSummary<O> storedSummary)
     {
-        for (IProvider<O> provider : providers)
+        for (IProvider<O> provider : providers.values())
         {
             final IItemSummary<O> providerSummary = storedSummary.getSummaryGroup().getSummaryForProvider(provider);
             if (providerSummary == null)
             {
-                final O fetchObject = storedSummary.getProvider().fetchObject(storedSummary.getIdentifier());
+                final O fetchObject = getProviderForSummary(storedSummary).fetchObject(storedSummary.getIdentifier());
                 SummaryGroup<O> summaryGroup = storedSummary.getSummaryGroup();
                 IItemSummary<O> updatedSummary = provider.insertObject(fetchObject);
                 summaryGroup.addSummary(updatedSummary);
-                updatedSummary.getProvider().getProviderStore().addItemSummary(updatedSummary);
+                getProviderForSummary(updatedSummary).getProviderStore().addItemSummary(updatedSummary);
             }
         }
     }
@@ -140,16 +139,17 @@ public class SyncManager<O> implements ISyncManager<O>
             @Override
             public void run()
             {
-                for (IProvider<O> provider : providers)
+                IProvider<O> inProvider = getProviderForSummary(oldSummary);
+                for (IProvider<O> provider : providers.values())
                 {
-                    if (provider != oldSummary.getProvider())
+                    if (provider != inProvider)
                     {
                         String foreignID = summaryGroup.getSummaryForProvider(provider).getIdentifier();
                         provider.deleteObject(foreignID);
                         provider.getProviderStore().deleteItemSummary(foreignID);
                     }
                 }
-                oldSummary.getProvider().getProviderStore().deleteItemSummary(oldSummary.getIdentifier());
+                inProvider.getProviderStore().deleteItemSummary(oldSummary.getIdentifier());
             }
         }));
     }
@@ -181,10 +181,11 @@ public class SyncManager<O> implements ISyncManager<O>
             @Override
             public void run()
             {
-                final O fetchObject = oldSummary.getProvider().fetchObject(oldSummary.getIdentifier());
-                for (IProvider<O> provider : providers)
+                IProvider<O> inProvider = getProviderForSummary(oldSummary);
+                final O fetchObject = inProvider.fetchObject(oldSummary.getIdentifier());
+                for (IProvider<O> provider : providers.values())
                 {
-                    if (provider != oldSummary.getProvider())
+                    if (provider != inProvider)
                     {
                         String foreignID = summaryGroup.getSummaryForProvider(provider).getIdentifier();
                         IItemSummary<O> updatedSummary = provider.updateObject(foreignID, fetchObject);
@@ -193,7 +194,7 @@ public class SyncManager<O> implements ISyncManager<O>
                         summaryGroup.addSummary(updatedSummary);
                     }
                 }
-                newSummary.getProvider().getProviderStore().addItemSummary(newSummary);
+                getProviderForSummary(newSummary).getProviderStore().addItemSummary(newSummary);
                 summaryGroup.addSummary(newSummary);
             }
         }));
@@ -206,12 +207,13 @@ public class SyncManager<O> implements ISyncManager<O>
         final SummaryGroup<O> summaryGroup = summary.getSummaryGroup() == null
                 ? new SummaryGroup<O>()
                 : summary.getSummaryGroup();
-        final O fetchObject = summary.getProvider().fetchObject(summary.getIdentifier());
+        final IProvider<O> inProvider = getProviderForSummary(summary);
+        final O fetchObject = inProvider.fetchObject(summary.getIdentifier());
 
         boolean equivConflict = false;
 
         // Loop through all providers.
-        for (IProvider<O> provider : providers)
+        for (IProvider<O> provider : providers.values())
         {
             IItemSummary<O> summaryForProvider = summaryGroup.getSummaryForProvider(provider);
             if (summaryForProvider != null)
@@ -229,9 +231,9 @@ public class SyncManager<O> implements ISyncManager<O>
                             @Override
                             public void run()
                             {
-                                for (IProvider<O> provider : providers)
+                                for (IProvider<O> provider : providers.values())
                                 {
-                                    if (provider != summary.getProvider())
+                                    if (provider != inProvider)
                                     {
                                         String foreignID = summaryGroup.getSummaryForProvider(provider).getIdentifier();
                                         IItemSummary<O> updatedSummary = provider.updateObject(foreignID, fetchObject);
@@ -240,7 +242,7 @@ public class SyncManager<O> implements ISyncManager<O>
                                         summaryGroup.addSummary(updatedSummary);
                                     }
                                 }
-                                summary.getProvider().getProviderStore().addItemSummary(summary);
+                                inProvider.getProviderStore().addItemSummary(summary);
                                 summaryGroup.addSummary(summary);
                             }
                         }));
@@ -249,7 +251,7 @@ public class SyncManager<O> implements ISyncManager<O>
                     }
                 }
             }
-            else if (provider != summary.getProvider())
+            else if (provider != inProvider)
             {
                 IItemSummary<O> updatedSummary = provider.insertObject(fetchObject);
                 provider.getProviderStore().addItemSummary(updatedSummary);
@@ -259,7 +261,7 @@ public class SyncManager<O> implements ISyncManager<O>
         // Only commit the result now if there was no conflict.
         if (!equivConflict)
         {
-            summary.getProvider().getProviderStore().addItemSummary(summary);
+            inProvider.getProviderStore().addItemSummary(summary);
             summaryGroup.addSummary(summary);
         }
     }
@@ -273,5 +275,10 @@ public class SyncManager<O> implements ISyncManager<O>
     public SyncState<O> getSyncState()
     {
         return syncState;
+    }
+
+    public IProvider<O> getProviderForSummary(IItemSummary<O> summary)
+    {
+        return providers.get(summary.getProviderName());
     }
 }

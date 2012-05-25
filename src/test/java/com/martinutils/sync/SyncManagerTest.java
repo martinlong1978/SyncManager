@@ -21,16 +21,16 @@ public class SyncManagerTest
 
     static class ProviderDelegate implements Delegate<IProvider<SyncClass>>
     {
-        IProviderStore<SyncClass> caturedStore;
+        IProviderStore<SyncClass> capturedStore;
 
         void setProviderStore(IProviderStore<SyncClass> store)
         {
-            this.caturedStore = store;
+            this.capturedStore = store;
         }
 
         IProviderStore<SyncClass> getProviderStore()
         {
-            return this.caturedStore;
+            return this.capturedStore;
         }
 
     }
@@ -39,8 +39,8 @@ public class SyncManagerTest
     public void test()
     {
 
-        final TestItemSummary summary1A = new TestItemSummary(null, provA, "1234", "1234", null);
-        final TestItemSummary summary1B = new TestItemSummary(null, provB, "1238", "1235", null);
+        final TestItemSummary summary1A = new TestItemSummary(null, "ProvA", "1234", "1234", null);
+        final TestItemSummary summary1B = new TestItemSummary(null, "ProvB", "1238", "1235", null);
 
         final ProviderDelegate pDelA = new ProviderDelegate();
         final ProviderDelegate pDelB = new ProviderDelegate();
