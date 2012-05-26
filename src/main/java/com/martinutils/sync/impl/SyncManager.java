@@ -1,5 +1,6 @@
 package com.martinutils.sync.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +27,17 @@ public class SyncManager<O> implements ISyncManager<O>
 
     private IConflictListener<O> listener;
 
-    private final SyncState<O> syncState = new SyncState<O>();
+    private final SyncState<O> syncState;
+
+    public SyncManager()
+    {
+        syncState = new SyncState<O>();
+    }
+
+    public SyncManager(byte[] bytes) throws IOException, ClassNotFoundException
+    {
+        syncState = SyncState.fromBytes(bytes);
+    }
 
     @Override
     public void addProvider(IProvider<O> provider)

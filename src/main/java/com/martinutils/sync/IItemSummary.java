@@ -1,12 +1,14 @@
 package com.martinutils.sync;
 
+import java.io.Serializable;
+
 import com.martinutils.sync.impl.SummaryGroup;
 
 /**
  * 
  * @author martin
  */
-public interface IItemSummary<O>
+public interface IItemSummary<O> extends Serializable
 {
 
     /**

@@ -1,5 +1,6 @@
 package com.martinutils.sync.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 import com.martinutils.sync.IItemSummary;
 import com.martinutils.sync.IProviderStore;
 
-public class ProviderStore<O> implements IProviderStore<O>
+public class ProviderStore<O> implements IProviderStore<O>, Serializable
 {
 
     private final Map<String, IItemSummary<O>> items = new HashMap<String, IItemSummary<O>>();

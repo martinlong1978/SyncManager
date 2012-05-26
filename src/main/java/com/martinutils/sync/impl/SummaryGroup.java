@@ -1,5 +1,6 @@
 package com.martinutils.sync.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import com.martinutils.sync.IProvider;
  * 
  * @param <O>
  */
-public class SummaryGroup<O>
+public class SummaryGroup<O> implements Serializable
 {
     private final Map<String, IItemSummary<O>> summaries = new HashMap<String, IItemSummary<O>>();
 
@@ -30,7 +31,7 @@ public class SummaryGroup<O>
 
     public IItemSummary<O> getSummaryForProvider(IProvider<O> provider)
     {
-        return summaries.get(provider);
+        return summaries.get(provider.getName());
     }
 
 }
