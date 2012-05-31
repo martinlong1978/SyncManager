@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.martinutils.sync.IConflictListener;
 import com.martinutils.sync.IItemSummary;
+import com.martinutils.sync.ILogger;
 import com.martinutils.sync.IProvider;
 import com.martinutils.sync.IProviderStore;
 import com.martinutils.sync.ISyncManager;
@@ -29,6 +30,8 @@ public class SyncManager<O> implements ISyncManager<O>
 
     private final SyncState<O> syncState;
 
+    private ILogger logger = new EmptyLogger();
+
     public SyncManager()
     {
         syncState = new SyncState<O>();
@@ -37,6 +40,11 @@ public class SyncManager<O> implements ISyncManager<O>
     public SyncManager(byte[] bytes) throws IOException, ClassNotFoundException
     {
         syncState = SyncState.fromBytes(bytes);
+    }
+
+    public void setLogger(ILogger logger)
+    {
+        this.logger = logger;
     }
 
     @Override
@@ -57,6 +65,7 @@ public class SyncManager<O> implements ISyncManager<O>
         // added.
         for (IProvider<O> provider : providers.values())
         {
+            logger.i("First pass : " + provider.getName());
             List<IItemSummary<O>> summaries = provider.getSummaries();
             providerSummaries.add(summaries);
             for (IItemSummary<O> summary : summaries)
@@ -86,6 +95,7 @@ public class SyncManager<O> implements ISyncManager<O>
 
     private void processProvider(List<IItemSummary<O>> summaries, IProvider<O> provider)
     {
+        logger.i("Second pass : " + provider.getName());
         IProviderStore<O> store = provider.getProviderStore();
         store.reset();
         for (IItemSummary<O> summary : summaries)
@@ -95,6 +105,7 @@ public class SyncManager<O> implements ISyncManager<O>
             if (storedSummary == null)
             {
                 // Item has been added.
+                logger.i("Adding : " + provider.getName() + " : " + summary.getIdentifier());
                 addItem(summary);
             }
             else
@@ -102,6 +113,12 @@ public class SyncManager<O> implements ISyncManager<O>
                 checkForNewProviders(storedSummary);
                 if (!storedSummary.getHash().equals(summary.getHash()))
                 {
+                    logger.i("Updating : "
+                            + provider.getName()
+                            + " : "
+                            + summary.getIdentifier()
+                            + " : "
+                            + storedSummary.getIdentifier());
                     // Item has been updated.
                     updateItem(storedSummary, summary);
                 }
@@ -109,7 +126,7 @@ public class SyncManager<O> implements ISyncManager<O>
         }
         for (IItemSummary<O> summary : store.getUnreadSummaries())
         {
-            System.out.println(summary);
+            logger.i("Deleting : " + provider.getName() + " : " + summary.getIdentifier());
             // Item has been deleted
             deleteItem(summary);
         }
