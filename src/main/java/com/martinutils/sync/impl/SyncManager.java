@@ -51,13 +51,13 @@ public class SyncManager<O> implements ISyncManager<O>
     {
 
         // Store these... we don't want to fetch again for the second pass
-        List<IItemSummary<O>[]> providerSummaries = new ArrayList<IItemSummary<O>[]>();
+        List<List<IItemSummary<O>>> providerSummaries = new ArrayList<List<IItemSummary<O>>>();
 
         // First pass, determines if there are any equivalents that shouldn't be
         // added.
         for (IProvider<O> provider : providers.values())
         {
-            IItemSummary<O>[] summaries = provider.getSummaries();
+            List<IItemSummary<O>> summaries = provider.getSummaries();
             providerSummaries.add(summaries);
             for (IItemSummary<O> summary : summaries)
             {
@@ -78,13 +78,13 @@ public class SyncManager<O> implements ISyncManager<O>
 
         // Second pass... now determine the actions
         Iterator<IProvider<O>> iterator = providers.values().iterator();
-        for (IItemSummary<O>[] summaries : providerSummaries)
+        for (List<IItemSummary<O>> summaries : providerSummaries)
         {
             processProvider(summaries, iterator.next());
         }
     }
 
-    private void processProvider(IItemSummary<O>[] summaries, IProvider<O> provider)
+    private void processProvider(List<IItemSummary<O>> summaries, IProvider<O> provider)
     {
         IProviderStore<O> store = provider.getProviderStore();
         store.reset();

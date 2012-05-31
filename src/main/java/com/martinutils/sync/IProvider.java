@@ -1,5 +1,7 @@
 package com.martinutils.sync;
 
+import java.util.List;
+
 public interface IProvider<O>
 {
 
@@ -16,23 +18,9 @@ public interface IProvider<O>
 
     public IItemSummary<O> updateObject(String id, O object);
 
-    /**
-     * There may be cases when there first sync occurs when both ends already
-     * contain equivalent data (for example after a backup is restored). If the
-     * provider can determine equivalence with an existing record then it can
-     * return that from here. Extend IItemSummary if you need additional details
-     * to determine equivalence.
-     * 
-     * Create the new summary and return it.
-     * 
-     * @param object
-     * @return
-     */
-    public IItemSummary<O> findEquivalent(IItemSummary<O> summary);
-
     public O fetchObject(String id);
 
-    public IItemSummary<O>[] getSummaries();
+    public List<IItemSummary<O>> getSummaries();
 
     public void setProviderStore(IProviderStore<O> store);
 

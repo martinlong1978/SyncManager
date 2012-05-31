@@ -1,5 +1,8 @@
 package com.martinutils.sync;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mockit.Delegate;
 import mockit.Mocked;
 import mockit.NonStrictExpectations;
@@ -59,12 +62,17 @@ public class SyncManagerTest
                 provB.setProviderStore((IProviderStore<SyncClass>) any);
                 result = pDelB;
 
+                List<IItemSummary<SyncClass>> listA = new ArrayList<IItemSummary<SyncClass>>();
+                List<IItemSummary<SyncClass>> listB = new ArrayList<IItemSummary<SyncClass>>();
+                
+                listA.add(summary1A);
+                
                 // Get the summaries
                 provA.getSummaries();
-                result = new TestItemSummary[] { summary1A };
+                result = listA;
 
                 provB.getSummaries();
-                result = new TestItemSummary[] {};
+                result = listB;
 
                 provA.getProviderStore();
                 result = pDelA;
