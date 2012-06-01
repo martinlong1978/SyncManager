@@ -76,10 +76,34 @@ public class SyncManager<O> implements ISyncManager<O>
                     SummaryGroup<O> equivalenceGroup = equivalenceGroups.get(globalID);
                     if (equivalenceGroup == null)
                     {
-                        equivalenceGroup = new SummaryGroup<O>();
+                        // If the summary already has a group, use it, otherwise
+                        // create a new one.
+                        equivalenceGroup = summary.getSummaryGroup();
+                        if (equivalenceGroup == null)
+                        {
+                            equivalenceGroup = new SummaryGroup<O>();
+                            equivalenceGroup.addSummary(summary);
+                        }
                         equivalenceGroups.put(globalID, equivalenceGroup);
                     }
-                    equivalenceGroup.addSummary(summary);
+                    else
+                    {
+                        logger.i("Found equivalent for : " + summary.getIdentifier() + " : " + summary.getGlobalID());
+                        SummaryGroup<O> existingGroup = summary.getSummaryGroup();
+                        // If the summary already has a group, transfer all of
+                        // the summaries across.
+                        if (existingGroup != null)
+                        {
+                            for (IItemSummary<O> s : existingGroup.getSummaries())
+                            {
+                                equivalenceGroup.addSummary(s);
+                            }
+                        }
+                        else
+                        {
+                            equivalenceGroup.addSummary(summary);
+                        }
+                    }
                 }
 
             }
